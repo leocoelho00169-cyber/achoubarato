@@ -1,7 +1,5 @@
 // Teste offline: node bot/teste.js  (não usa internet nem credenciais)
 import assert from 'node:assert/strict';
-process.env.ML_MATT_TOOL = '12345';
-process.env.ML_MATT_WORD = 'achoubarato';
 process.env.SHEIN_LINK_TEMPLATE = 'https://www.awin1.com/cread.php?awinmid=1&awinaffid=9&ued={url_enc}';
 process.env.SHOPEE_APP_ID = 'x'; process.env.SHOPEE_SECRET = 'y';
 process.env.ML_CLIENT_ID = 'x'; process.env.ML_CLIENT_SECRET = 'y';
@@ -17,8 +15,10 @@ assert.equal(toNumber('R$ 1.299,90'), 1299.9);
 assert.equal(toNumber('49.9'), 49.9);
 
 // afiliado
-const ml = await gerarLinkAfiliado('Mercado Livre', 'https://produto.mercadolivre.com.br/MLB-123-x?foo=1#frag');
-assert.ok(ml.ok && ml.link.includes('matt_tool=12345') && ml.link.includes('foo=1') && !ml.link.includes('#'));
+const ml = await gerarLinkAfiliado('Mercado Livre', 'https://produto.mercadolivre.com.br/MLB-123-x');
+assert.equal(ml.ok, false);                                   // nunca monta link ML sozinho
+const ml2 = await gerarLinkAfiliado('Mercado Livre', 'https://produto.mercadolivre.com.br/MLB-123-x', 'https://meli.la/abc');
+assert.ok(ml2.ok && ml2.link === 'https://meli.la/abc');
 const sh = await gerarLinkAfiliado('Shein', 'https://br.shein.com/a-p-1.html');
 assert.ok(sh.ok && sh.link.includes('ued=https%3A%2F%2Fbr.shein.com'));
 const sp = await gerarLinkAfiliado('Shopee', 'https://shopee.com.br/x', 'https://s.shopee.com.br/abc');
@@ -47,7 +47,7 @@ const deps = {
     { loja: 'Shopee', produtoId: '4', titulo: 'Já postado ontem', preco: 10, precoOriginal: 100, imagem: 'x', url: 'https://shopee.com.br/4', linkAfiliado: 'https://s.shopee.com.br/4' },
   ],
   buscarMercadoLivre: async () => [
-    { loja: 'Mercado Livre', produtoId: 'MLB9', titulo: 'Air Fryer 4L', preco: 200, precoOriginal: 400, imagem: 'https://i/9.jpg', url: 'https://produto.mercadolivre.com.br/MLB-9' },
+    { loja: 'Mercado Livre', produtoId: 'MLB9', titulo: 'Air Fryer 4L', preco: 200, precoOriginal: 400, imagem: 'https://i/9.jpg', url: 'https://produto.mercadolivre.com.br/MLB-9', linkAfiliado: 'https://meli.la/xyz' },
   ],
   lerPagina: async (url) => ({ loja: null, produtoId: 'S1', titulo: 'Vestido Shein', preco: 59.9, precoOriginal: null, imagem: 'https://i/s.jpg', url }),
   gerarLinkAfiliado,
@@ -71,7 +71,7 @@ assert.equal(publicadas.length, 3);
 assert.equal(enviadas.length, 3);
 assert.equal(publicadas[0].loja, 'Shein');                      // fila manual vem primeiro
 assert.ok(publicadas.every((p) => p.descricao && p.link_afiliado && p.imagem_url));
-assert.ok(publicadas.find((p) => p.loja === 'Mercado Livre').link_afiliado.includes('matt_tool=12345'));
+assert.equal(publicadas.find((p) => p.loja === 'Mercado Livre').link_afiliado, 'https://meli.la/xyz');
 assert.deepEqual(filaAtualizada, [[7, { status: 'publicado' }]]);
 assert.equal(historico.length, 3);
 // ofertas cadastradas no Admin (ex.: Shopee sem API) -> descrição + Telegram

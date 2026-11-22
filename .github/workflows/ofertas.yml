@@ -38,6 +38,4 @@ jobs:
           SHOPEE_SECRET: ${{ secrets.SHOPEE_SECRET }}
           ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
           ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
-          ML_MATT_TOOL: ${{ secrets.ML_MATT_TOOL }}
-          ML_MATT_WORD: ${{ secrets.ML_MATT_WORD }}
           SHEIN_LINK_TEMPLATE: ${{ secrets.SHEIN_LINK_TEMPLATE }}
