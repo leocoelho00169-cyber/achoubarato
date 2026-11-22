@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Search, Share2, ExternalLink, PlusCircle, Lock, Trash2, BarChart3, Tag, Upload } from 'lucide-react';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// aceita o endereço com "/" no fim, com "/rest/v1" ou com espaços colados por engano
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim();
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const LOJAS = ['Todas', 'Shopee', 'Amazon', 'Mercado Livre', 'Netshoes', 'AliExpress', 'Magalu'];
