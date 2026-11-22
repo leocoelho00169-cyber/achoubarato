@@ -26,8 +26,9 @@ export const config = {
   },
 
   supabase: {
-    url: env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL,
-    serviceKey: env.SUPABASE_SERVICE_ROLE_KEY,
+    // aceita o endereço com "/" no fim, com "/rest/v1" ou com espaços colados por engano
+    url: (env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || '').trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, ''),
+    serviceKey: (env.SUPABASE_SERVICE_ROLE_KEY || '').trim(),
   },
 
   shopee: { appId: env.SHOPEE_APP_ID, secret: env.SHOPEE_SECRET },
