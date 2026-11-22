@@ -74,4 +74,23 @@ assert.ok(publicadas.every((p) => p.descricao && p.link_afiliado && p.imagem_url
 assert.ok(publicadas.find((p) => p.loja === 'Mercado Livre').link_afiliado.includes('matt_tool=12345'));
 assert.deepEqual(filaAtualizada, [[7, { status: 'publicado' }]]);
 assert.equal(historico.length, 3);
+// ofertas cadastradas no Admin (ex.: Shopee sem API) -> descrição + Telegram
+const env2 = [], marc2 = [];
+const st2 = await executar({
+  telegramOk: true, pausaBusca: 0, buscarShopee: async () => [], buscarMercadoLivre: async () => [],
+  lerPagina: async () => { throw new Error('nao deveria ler'); }, gerarLinkAfiliado,
+  enviarOferta: async (o) => { env2.push(o); },
+  db: {
+    expirarAntigas: async () => {}, linksPendentes: async () => [], atualizarLink: async () => {},
+    jaPublicadoRecentemente: async () => false, estatisticasPreco: async () => null,
+    manuaisPendentes: async () => [{ id: 42, titulo: 'Fone Bluetooth Shopee', loja: 'Shopee', preco_oferta: 39.9, preco_original: 79.9,
+      link_afiliado: 'https://s.shopee.com.br/meulink', imagem_url: 'https://i/f.jpg', descricao: null }],
+    marcar: async (id, c) => marc2.push([id, c]),
+  },
+});
+assert.equal(st2.manuais, 1);
+assert.equal(env2.length, 1);
+assert.equal(env2[0].link, 'https://s.shopee.com.br/meulink');
+assert.ok(marc2.some(([id, c]) => id === 42 && c.descricao));
+assert.ok(marc2.some(([id, c]) => id === 42 && c.enviado_telegram === true));
 console.log('\nTODOS OS TESTES PASSARAM ✅');

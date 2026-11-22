@@ -31,6 +31,11 @@ Repositório > Settings > Secrets and variables > Actions > New repository secre
 Aba **Actions > Robô de ofertas > Run workflow**. Use `dry_run = 1` para testar sem publicar.
 Depois ele roda sozinho nos horários do arquivo `.github/workflows/ofertas.yml`.
 
+## Shopee sem acesso à Open API (ou qualquer oferta manual)
+Cadastre a oferta no painel **Admin** do site, com o seu link de afiliado, como já fazia. Na próxima rodada o robô
+cria a descrição automática (desconto, preço etc.) e envia ao Telegram. Só valem ofertas cadastradas nas últimas 24h.
+Nesse modo a Shopee não é buscada automaticamente (basta não cadastrar os Secrets da Shopee).
+
 ## Shein (e qualquer loja sem API): fila de links
 A Shein não tem API de produtos e bloqueia robôs. Solução gratuita: no Supabase, tabela `fila_links`,
 insira uma linha com a `url` do produto (e `loja` = `Shein`). Na próxima rodada o robô tenta ler preço/foto;
