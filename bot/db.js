@@ -48,6 +48,12 @@ export async function marcar(id, campos) {
   });
 }
 
+// Ofertas cadastradas à mão no Admin (últimas 24h) que ainda não foram para o Telegram.
+export async function manuaisPendentes(limite = 10) {
+  const desde = new Date(Date.now() - 24 * 3600000).toISOString();
+  return fetchJson(`${base()}/ofertas?select=*&origem=eq.manual&ativa=eq.true&enviado_telegram=eq.false&created_at=gte.${desde}&order=created_at.asc&limit=${limite}`, { headers: headers() });
+}
+
 export async function linksPendentes(limite = 10) {
   return fetchJson(`${base()}/fila_links?select=*&status=eq.pendente&order=created_at.asc&limit=${limite}`, { headers: headers() });
 }

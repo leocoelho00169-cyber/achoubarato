@@ -62,11 +62,41 @@ async function coletarFila(deps) {
   return out;
 }
 
+/** Ofertas cadastradas por você no Admin: o robô cria a descrição e envia ao Telegram. */
+async function processarManuais(deps, stats) {
+  if (!deps.db.manuaisPendentes) return;
+  const lista = await deps.db.manuaisPendentes(10).catch((e) => { console.warn('[manuais] ' + e.message); return []; });
+  for (const o of lista) {
+    try {
+      const { descricao, legendaHtml } = gerarDescricao({
+        titulo: o.titulo, loja: o.loja, preco: Number(o.preco_oferta),
+        precoOriginal: o.preco_original ? Number(o.preco_original) : null, historico: null,
+      }, String(o.id).length);
+      if (config.dryRun) {
+        console.log('\n--- [DRY RUN] enviaria oferta manual ---\n' + legendaHtml + '\nlink: ' + o.link_afiliado);
+        stats.manuais++; continue;
+      }
+      if (!o.descricao) await deps.db.marcar(o.id, { descricao });
+      if (deps.telegramOk) {
+        await deps.enviarOferta({ legendaHtml, link: o.link_afiliado, imagem: o.imagem_url });
+        await deps.db.marcar(o.id, { enviado_telegram: true });
+      }
+      stats.manuais++;
+      console.log(`✅ (manual) ${o.loja}: ${o.titulo.slice(0, 70)}`);
+      await sleep(config.pausaEntreEnvios);
+    } catch (e) {
+      stats.erros++;
+      console.warn(`❌ manual ${o.id}: ${e.message}`);
+    }
+  }
+}
+
 export async function executar(deps) {
-  const stats = { publicadas: 0, ignoradas: 0, erros: 0 };
+  const stats = { publicadas: 0, ignoradas: 0, erros: 0, manuais: 0 };
   const dry = config.dryRun;
 
   if (!dry) await deps.db.expirarAntigas(3).catch((e) => console.warn('[expirar] ' + e.message));
+  await processarManuais(deps, stats);
 
   const candidatos = [...(await coletarFila(deps)), ...(await coletar(deps))];
   // melhores descontos primeiro; links colados à mão sempre na frente
@@ -122,7 +152,7 @@ export async function executar(deps) {
       console.warn(`❌ ${c.loja} ${c.produtoId}: ${e.message}`);
     }
   }
-  console.log(`\nResumo: ${stats.publicadas} publicadas, ${stats.ignoradas} ignoradas, ${stats.erros} erros.`);
+  console.log(`\nResumo: ${stats.publicadas} publicadas pelo robô, ${stats.manuais} do Admin enviadas, ${stats.ignoradas} ignoradas, ${stats.erros} erros.`);
   return stats;
 }
 

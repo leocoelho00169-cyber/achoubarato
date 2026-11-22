@@ -29,16 +29,6 @@ async function shopeeShortLink(url) {
   return data?.generateShortLink?.shortLink || null;
 }
 
-function mercadoLivreLink(url) {
-  const { mattTool, mattWord } = config.mercadoLivre;
-  if (!mattTool) return null;
-  const u = new URL(url);
-  u.hash = '';
-  u.searchParams.set('matt_tool', mattTool);
-  if (mattWord) u.searchParams.set('matt_word', mattWord);
-  return u.toString();
-}
-
 function templateLink(template, url) {
   if (!template) return null;
   return template.replaceAll('{url_enc}', encodeURIComponent(url)).replaceAll('{url}', url);
@@ -56,8 +46,9 @@ export async function gerarLinkAfiliado(loja, urlOriginal, linkJaAfiliado = null
       return { link, ok: !!link };
     }
     if (loja === 'Mercado Livre') {
-      const link = mercadoLivreLink(urlOriginal);
-      return { link, ok: !!link };
+      // O Mercado Livre não tem API de afiliados e proíbe editar o link gerado na Central de Afiliados.
+      // Por isso só usamos um link que você gerou lá (cadastrado no Admin); o robô nunca monta link ML sozinho.
+      return { link: linkJaAfiliado, ok: !!linkJaAfiliado };
     }
     if (loja === 'Shein') {
       const link = templateLink(config.sheinTemplate, urlOriginal);

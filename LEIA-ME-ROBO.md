@@ -15,7 +15,7 @@ Supabase > SQL Editor > cole o conteúdo de `supabase/schema.sql` > Run.
 | Loja | O que criar | Secrets |
 |---|---|---|
 | Shopee | Programa de Afiliados Shopee > "Open API" > AppID e Secret | `SHOPEE_APP_ID`, `SHOPEE_SECRET` |
-| Mercado Livre | App em developers.mercadolivre.com.br + seu ID de afiliado | `ML_CLIENT_ID`, `ML_CLIENT_SECRET`, `ML_MATT_TOOL`, `ML_MATT_WORD` |
+| Mercado Livre | Veja a seção "Mercado Livre" abaixo (modo manual) | — |
 | Shein | Seu programa de afiliados (ex.: Awin) | `SHEIN_LINK_TEMPLATE` |
 
 `SHEIN_LINK_TEMPLATE` é o modelo do seu deep link, com `{url_enc}` no lugar da URL do produto. Ex. Awin:
@@ -30,6 +30,16 @@ Repositório > Settings > Secrets and variables > Actions > New repository secre
 ## 5. Rodar
 Aba **Actions > Robô de ofertas > Run workflow**. Use `dry_run = 1` para testar sem publicar.
 Depois ele roda sozinho nos horários do arquivo `.github/workflows/ofertas.yml`.
+
+## Mercado Livre
+O ML não tem API de afiliados e as regras do programa proíbem editar o link gerado. Por isso o robô **não monta
+link do ML sozinho**. No computador, gere o link no **Gerador de links** da Central de Afiliados do ML e cadastre a
+oferta no Admin do site, como na seção abaixo. O robô cria a descrição e envia ao Telegram.
+
+## Shopee sem acesso à Open API (ou qualquer oferta manual)
+Cadastre a oferta no painel **Admin** do site, com o seu link de afiliado, como já fazia. Na próxima rodada o robô
+cria a descrição automática (desconto, preço etc.) e envia ao Telegram. Só valem ofertas cadastradas nas últimas 24h.
+Nesse modo a Shopee não é buscada automaticamente (basta não cadastrar os Secrets da Shopee).
 
 ## Shein (e qualquer loja sem API): fila de links
 A Shein não tem API de produtos e bloqueia robôs. Solução gratuita: no Supabase, tabela `fila_links`,

@@ -35,8 +35,6 @@ export const config = {
   mercadoLivre: {
     clientId: env.ML_CLIENT_ID,
     clientSecret: env.ML_CLIENT_SECRET,
-    mattTool: env.ML_MATT_TOOL,   // seu ID de afiliado ML
-    mattWord: env.ML_MATT_WORD,   // sua etiqueta/campanha
   },
 
   // Shein e outras lojas: modelo do link de afiliado com {url} (URL do produto) e/ou {url_enc} (codificada).
