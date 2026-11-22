@@ -276,6 +276,12 @@ export default function AchouBaratoApp() {
                     <div style={{ padding: '14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                       <div>
                         <h3 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#18181b', lineHeight: '1.3' }}>{item.titulo}</h3>
+                        {item.descricao && (
+                          <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#52525b', lineHeight: '1.4' }}>{item.descricao}</p>
+                        )}
+                        {item.descricao && (
+                          <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#52525b', lineHeight: '1.4' }}>{item.descricao}</p>
+                        )}
                         {item.preco_original && (
                           <div style={{ fontSize: '12px', color: '#a1a1aa', textDecoration: 'line-through' }}>
                             De {Number(item.preco_original).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
